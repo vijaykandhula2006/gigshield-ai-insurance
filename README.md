@@ -1,121 +1,158 @@
-# GigShield – AI Powered Insurance & Risk Profiling for Delivery Workers
+GigShield – AI-Powered Parametric Income Insurance for Delivery Workers
 
-## Problem Statement
+ Problem Statement
 
-Delivery workers (Swiggy, Zomato, Amazon, etc.) face high risks such as accidents, extreme weather conditions, and long working hours.
+Delivery workers (Swiggy, Zomato, Amazon, etc.) often lose income due to external disruptions such as heavy rain, extreme heat, pollution, or curfews.
+
+These disruptions reduce working hours, leading to significant income loss.
 
 Current challenges:
 
-* Insurance is not personalized
-* Premiums are fixed and unfair
-* Fraudulent claims are common
-* Duplicate identities are not detected
+- No income protection system exists
+- Workers bear financial loss alone
+- Insurance models are not designed for gig economy workers
 
-GigShield aims to solve this by introducing AI-driven risk profiling and fraud detection.
+GigShield solves this by providing AI-powered parametric income insurance with automatic payouts.
 
 ---
 
-## Persona-Based Scenarios
+👤 Persona-Based Scenario
 
-### Persona 1: Delivery Worker (Ravi)
+Persona: Delivery Worker (Ravi)
 
-* Works long hours daily
-* Travels in risky conditions
+- Works for a delivery platform
+- Depends on daily income
+- Faces frequent disruptions (rain, heat, pollution)
 
 Problem:
-Same insurance premium despite higher risk
+During heavy rain or extreme conditions, Ravi cannot work → loses income
 
 Solution:
-GigShield dynamically adjusts premium based on risk
+GigShield automatically detects disruptions and provides compensation for lost income.
 
 ---
 
-### Persona 2: Insurance Provider
+🔄 Application Workflow
 
-* Needs accurate risk assessment
-* Wants to prevent fraud
+1. User registers using face-based identity
+2. Weekly insurance policy is activated
+3. AI calculates user risk profile
+4. System monitors external events (weather, pollution, etc.)
+5. Parametric trigger detected (e.g., heavy rain)
+6. Income loss is calculated
+7. Automatic claim is initiated
+8. Instant payout is processed
 
-Solution:
-GigShield uses AI to detect duplicate identities and risky behavior
+💡 Example (Income Loss Calculation)
+
+If:
+
+- Heavy rain stops deliveries for 4 hours
+- Average earning = ₹80/hour
+
+👉 Income loss = 4 × 80 = ₹320
+👉 Instant payout = ₹320
 
 ---
 
-## Application Workflow
-
-1. User registers using face encoding
-2. Unique Human ID is generated
-3. Risk factors are monitored
-4. Risk score is calculated
-5. Weekly premium is updated
-6. Fraud attempts are detected
-7. High-risk users are flagged or locked
-
----
-
-##  Weekly Premium Model
+ Weekly Premium Model
 
 Premium is calculated based on:
 
-* Working hours
-* Distance traveled
-* Weather conditions
-* Risk score
+- Location risk (flood-prone / pollution-prone areas)
+- Historical weather disruptions
+- AI-generated risk score
 
-### Example:
+Example:
 
-* Low Risk → ₹50/week
-* Medium Risk → ₹100/week
-* High Risk → ₹200/week
-
-### Parametric Triggers:
-
-* Rain → Increase risk
-* Long distance → Increase risk
-* Night shifts → Increase risk
+Risk Level| Premium
+Low Risk| ₹50/week
+Medium Risk| ₹100/week
+High Risk| ₹200/week
 
 ---
 
-##  AI/ML Integration
+ Parametric Triggers (Core Feature)
 
-* Risk Prediction Model
-* Fraud Detection using Face Encoding
-* Dynamic Premium Adjustment
+GigShield uses real-world data to trigger automatic claims:
 
----
+- Rainfall above threshold → payout triggered
+- Temperature above threshold → payout triggered
+- AQI (Pollution level) above threshold → payout triggered
+- Government curfew / zone closure → payout triggered
 
-##  Tech Stack
-
-* Backend: Flask (Python)
-* Database: SQLite
-* AI: Face Recognition
-* Version Control: GitHub
+ This is a zero-touch claim system — no manual claim submission required.
 
 ---
 
-##  Development Plan
+ Integration Capabilities
 
-Phase 1:
-
-* Idea + Backend setup
-
-Phase 2:
-
-* Login + Fraud detection
-
-Phase 3:
-
-* Risk scoring + Premium logic
-
-Phase 4:
-
-* UI + Deployment
+- Weather API (rainfall, temperature data)
+- Pollution API (AQI levels)
+- Mock delivery platform data (working hours estimation)
+- Payment gateway simulation (UPI/Razorpay for payouts)
 
 ---
 
-##  Future Scope
+ AI/ML Integration
 
-* Mobile application
-* Real-time GPS tracking
-* Weather API integration
-* Insurance company integration
+- AI-based risk prediction model
+- Dynamic premium calculation
+- Fraud detection (duplicate identity, anomaly detection)
+- Behavioral pattern analysis
 
+---
+
+ Fraud Detection
+
+- Face-based identity verification
+- Duplicate account detection
+- Suspicious activity monitoring
+- Claim validation mechanisms
+
+---
+
+ Tech Stack
+
+- Backend: Flask (Python)
+- Database: SQLite
+- AI: Face Recognition + Risk Scoring
+- APIs: Weather API (planned / simulated)
+- Version Control: GitHub
+
+---
+
+ Development Plan
+
+Phase 1
+
+- Idea design
+- Backend setup
+- Risk model planning
+
+Phase 2
+
+- Policy creation
+- Dynamic pricing
+- Parametric trigger logic
+
+Phase 3
+
+- Claim automation
+- Fraud detection system
+
+Phase 4
+
+- Dashboard
+- Payout simulation
+- Deployment
+
+---
+
+ Future Scope
+
+- Mobile application
+- Real-time GPS validation
+- Live weather API integration
+- Payment gateway integration (UPI / Razorpay)
+- Advanced AI fraud detection
