@@ -1,6 +1,6 @@
 # GigShield – AI Powered Insurance & Risk Profiling for Delivery Workers
 
-## 🚀 Problem Statement
+## Problem Statement
 
 Delivery workers (Swiggy, Zomato, Amazon, etc.) face high risks such as accidents, extreme weather conditions, and long working hours.
 
@@ -15,7 +15,7 @@ GigShield aims to solve this by introducing AI-driven risk profiling and fraud d
 
 ---
 
-## 👤 Persona-Based Scenarios
+## Persona-Based Scenarios
 
 ### Persona 1: Delivery Worker (Ravi)
 
@@ -40,7 +40,7 @@ GigShield uses AI to detect duplicate identities and risky behavior
 
 ---
 
-## 🔄 Application Workflow
+## Application Workflow
 
 1. User registers using face encoding
 2. Unique Human ID is generated
@@ -52,7 +52,7 @@ GigShield uses AI to detect duplicate identities and risky behavior
 
 ---
 
-## 💰 Weekly Premium Model
+##  Weekly Premium Model
 
 Premium is calculated based on:
 
@@ -75,7 +75,7 @@ Premium is calculated based on:
 
 ---
 
-## 🤖 AI/ML Integration
+##  AI/ML Integration
 
 * Risk Prediction Model
 * Fraud Detection using Face Encoding
@@ -83,7 +83,7 @@ Premium is calculated based on:
 
 ---
 
-## 💻 Tech Stack
+##  Tech Stack
 
 * Backend: Flask (Python)
 * Database: SQLite
@@ -92,7 +92,7 @@ Premium is calculated based on:
 
 ---
 
-## 🛠 Development Plan
+##  Development Plan
 
 Phase 1:
 
@@ -112,7 +112,7 @@ Phase 4:
 
 ---
 
-## 🔮 Future Scope
+##  Future Scope
 
 * Mobile application
 * Real-time GPS tracking
