@@ -1,7 +1,7 @@
 GigShield – AI-Powered Parametric Income Insurance for Delivery Workers
 
 ## 👥 Team & Responsibilities
-- Harshith (Backend Developer)
+- Harshith (Backend Developer & System Architecture)
 - Vignesh (API Integeration)
 - Sathwik (AI/Risk Model)
 - Shresta (Frontend Developer)
