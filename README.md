@@ -1,5 +1,12 @@
 GigShield – AI-Powered Parametric Income Insurance for Delivery Workers
 
+## 👥 Team & Responsibilities
+- Harshith (Backend Developer)
+- Vignesh (API Integeration)
+- Sathwik (AI/Risk Model)
+- Shresta (Frontend Developer)
+- Vijay (Dashboard+Demo+PPT)
+
  Problem Statement
 
 Delivery workers (Swiggy, Zomato, Amazon, etc.) often lose income due to external disruptions such as heavy rain, extreme heat, pollution, or curfews.
@@ -156,3 +163,64 @@ Phase 4
 - Live weather API integration
 - Payment gateway integration (UPI / Razorpay)
 - Advanced AI fraud detection
+
+---
+
+📉 Market Crash Handling
+
+GigShield is designed to handle large-scale disruptions affecting multiple users simultaneously.
+
+In case of a market-wide disruption (e.g., heavy rainfall across a city):
+
+- AI models predict expected claim volume
+- Dynamic payout limits are applied to maintain system sustainability
+- Risk-adjusted premium updates are triggered for upcoming weeks
+- Claims are prioritized based on verified activity and location data
+
+This ensures that the platform remains financially stable while still protecting workers during large-scale events.
+
+---
+
+🛡️ Adversarial Defense & Anti-Spoofing Strategy
+
+GigShield is designed to detect and prevent large-scale coordinated fraud attacks such as GPS spoofing and fake claims.
+
+🔍 Multi-Layer Fraud Detection:
+
+1. Face Identity Verification
+- Each user is uniquely identified using face encoding
+- Prevents duplicate accounts and identity spoofing
+
+2. Behavioral Pattern Analysis
+- Detects unusual patterns such as:
+  - Multiple claims in short time
+  - Abnormal working hours
+  - Unrealistic activity spikes
+
+3. Location Validation (Anti-GPS Spoofing)
+- Cross-verification using:
+  - Historical movement patterns
+  - Expected delivery zones
+  - Time-based travel feasibility
+- Flags impossible or suspicious location jumps
+
+4. Anomaly Detection using AI
+- AI model identifies:
+  - Sudden surge in claims from same region
+  - Similar behavior across multiple users (fraud rings)
+- High-risk clusters are flagged instantly
+
+5. Risk-Based Claim Control
+- High-risk users:
+  - Claims are delayed or reduced
+  - Additional verification triggered
+- Genuine users are not impacted
+
+6. Market Crash Handling
+- During mass disruptions:
+  - System limits maximum payouts dynamically
+  - Prioritizes verified and active users
+  - Adjusts future premiums based on risk surge
+
+Outcome:
+GigShield ensures protection against fraud rings while maintaining fairness for genuine workers.
