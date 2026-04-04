@@ -1,8 +1,8 @@
-from flask import Flask, jsonify
+import os
+import uuid
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from database.db import db
-from flask import request
-import uuid
 from database.models import User, Attempt
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 
@@ -16,10 +16,20 @@ CORS(app)
 app.config["JWT_SECRET_KEY"] = "super-secret-key-change-this"
 jwt = JWTManager(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///gigshield_v2.db'
+db_path = os.environ.get('DATABASE_URL')
+if not db_path:
+    if os.environ.get('VERCEL'):
+        db_path = 'sqlite:////tmp/gigshield_v2.db'
+    else:
+        db_path = 'sqlite:///gigshield_v2.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = db_path
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
+
+with app.app_context():
+    db.create_all()
 
 app.register_blueprint(claim_bp)
 app.register_blueprint(policy_bp)

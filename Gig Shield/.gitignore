@@ -1,0 +1,21 @@
+# Python cache and packaging
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Environment files
+.env
+
+# SQLite database files
+*.db
+
+# Vercel local files
+.vercel/

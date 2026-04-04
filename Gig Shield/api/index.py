@@ -1,6 +1,13 @@
-from gigshield import app
 import os
+import sys
 from dotenv import load_dotenv
+
+# Ensure the project root is on sys.path when Vercel imports this file.
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, ROOT_DIR)
+
+from app import app
+application = app
 
 load_dotenv()
 
