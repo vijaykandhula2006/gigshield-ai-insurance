@@ -31,7 +31,7 @@ from flask import Flask, jsonify, render_template
 
 @app.route("/")
 def home():
-    return jsonify({"message": "BioShield Backend Running"})
+    return render_template("user/login.html")
 
 # --- USER FRONTEND ROUTES ---
 @app.route("/login", methods=["GET"])
@@ -370,6 +370,12 @@ def admin_login():
     else:
         return jsonify({"message": "Invalid credentials"}), 401
     
+app.static_folder = 'static'
+
+@app.route('/admin-dashboard')
+def admin_dashboard():
+    return render_template('index/index.html')
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
