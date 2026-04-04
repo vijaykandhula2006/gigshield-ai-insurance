@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>GigShield - Face Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/dist/face-api.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; }
+        .plus-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        .scanner-box {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 0 auto;
+            border: 4px solid #fff;
+            box-shadow: 0 12px 40px rgba(0, 84, 64, 0.15);
+            background: #e2e2e2;
+        }
+
+        .video-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* mirror */
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #22d3a5;
+            box-shadow: 0 0 15px 4px rgba(34, 211, 165, 0.5);
+            animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+            display: none;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        .auth-ring {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border: 6px solid transparent;
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            pointer-events: none;
+        }
+
+        .auth-ring.success {
+            border-color: #22c55e;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+        
+        .auth-ring.error {
+            border-color: #ef4444;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .pulse-bg {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(0,84,64,0.1) 0%, rgba(0,84,64,0) 70%);
+            border-radius: 50%;
+            animation: pulseBg 3s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes pulseBg {
+            0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.5; }
+            100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+        }
+
+        .fallback-avatar {
+            font-size: 100px;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%; height: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative overflow-hidden text-[#1a1c1c]">
+
+    <!-- Header -->
+    <header class="w-full pt-8 pb-4 px-6 flex justify-center items-center absolute top-0 z-10">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#005440] to-[#086b53] flex items-center justify-center">
+                <span class="text-white text-sm font-bold">🛡</span>
+            </div>
+            <span class="plus-jakarta font-bold text-xl tracking-tight text-[#005440]">GigShield</span>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center px-6 relative z-10 w-full max-w-[400px] mx-auto pt-16 pb-8">
+        
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold mb-2 plus-jakarta">Face Login</h1>
+            <p class="text-[#3f4944] px-4" id="status-text">Position your face within the frame to authenticate instantly</p>
+        </div>
+
+        <div class="relative mb-12">
+            <div class="pulse-bg"></div>
+            <div class="scanner-box" id="scannerBox">
+                <!-- Video element for WebRTC -->
+                <video id="videoFeed" class="video-feed" autoplay playsinline muted></video>
+                <div class="fallback-avatar" id="fallbackAvatar" style="display:none;">
+                    <span class="material-symbols-outlined" style="font-size: 120px;">face</span>
+                </div>
+                <div class="scanline" id="scanline"></div>
+                <div class="auth-ring" id="authRing"></div>
+            </div>
+            
+            <div class="absolute -bottom-4 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2 z-20">
+                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse" id="camIndicator"></div>
+                <span class="text-xs font-semibold text-gray-500 uppercase tracking-widest" id="camStatus">Camera Active</span>
+            </div>
+        </div>
+
+        <button id="scanBtn" onclick="startScan()" class="w-full bg-[#005440] text-white py-4 rounded-2xl font-bold text-lg shadow-[0px_8px_24px_rgba(0,84,64,0.2)] active:scale-[0.98] transition-all relative overflow-hidden group">
+            <span class="relative z-10 flex items-center justify-center gap-2">
+                <span class="material-symbols-outlined font-light">center_focus_strong</span>
+                Authenticate Now
+            </span>
+            <div class="absolute inset-0 bg-white/20 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300"></div>
+        </button>
+
+        <button onclick="window.location.href='/plans'" class="w-full mt-4 text-[#005440] font-semibold py-3 rounded-xl hover:bg-gray-100 transition-colors text-sm">
+            Skip to Plans (Demo)
+        </button>
+
+    </main>
+
+    <script>
+        const video = document.getElementById('videoFeed');
+        const fallback = document.getElementById('fallbackAvatar');
+        const camIndicator = document.getElementById('camIndicator');
+        const camStatus = document.getElementById('camStatus');
+        const statusText = document.getElementById('status-text');
+
+        let modelsLoaded = false;
+
+        // Init WebRTC and ML Models
+        async function initCamera() {
+            try {
+                statusText.innerText = "Loading AI Models...";
+                await faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/model');
+                modelsLoaded = true;
+                statusText.innerText = "Position your face within the frame to authenticate instantly";
+
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                video.srcObject = stream;
+            } catch (err) {
+                console.log("Camera access denied or models failed to load", err);
+                video.style.display = 'none';
+                fallback.style.display = 'flex';
+                camIndicator.classList.remove('bg-red-500', 'animate-pulse');
+                camIndicator.classList.add('bg-gray-400');
+                camStatus.innerText = "Camera Unavailable";
+            }
+        }
+
+        initCamera();
+
+        let scanInterval;
+
+        function startScan() {
+            if(!modelsLoaded) {
+                alert("ML Models are still loading. Please wait.");
+                return;
+            }
+
+            const btn = document.getElementById('scanBtn');
+            const scanline = document.getElementById('scanline');
+            const authRing = document.getElementById('authRing');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin hidden">autorenew</span> Scanning...';
+            btn.style.opacity = '0.8';
+            
+            scanline.style.display = 'block';
+            statusText.innerText = "Analyzing biometric factors...";
+            statusText.classList.add('animate-pulse');
+
+            // Real ML loop
+            scanInterval = setInterval(async () => {
+                const detections = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions());
+                
+                if (detections && detections.score > 0.6) {
+                    clearInterval(scanInterval); // Face found! Stop looping
+                    
+                    scanline.style.display = 'none';
+                    statusText.classList.remove('animate-pulse');
+                    
+                    // Visual Success
+                    authRing.classList.add('success');
+                    statusText.innerText = "Identity Verified!";
+                    statusText.style.color = "#22c55e";
+                    statusText.style.fontWeight = "600";
+                    btn.innerHTML = 'Secure connection established <span class="material-symbols-outlined">check</span>';
+                    btn.style.background = '#22c55e';
+                    
+                    try {
+                        const res = await fetch("/login", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                human_id: "U01",
+                                face_encoding: "mock_face_encoding_data"
+                            })
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json();
+                            localStorage.setItem('user', data.human_id || 'U01');
+                        } else {
+                            localStorage.setItem('user', 'U01');
+                        }
+                    } catch(err) {
+                        console.error("Login fallback:", err);
+                        localStorage.setItem('user', 'U01');
+                    }
+
+                    setTimeout(() => {
+                        window.location.href = "/plans";
+                    }, 1200);
+                }
+            }, 100); // Check 10 times a second
+        }
+    </script>
+</body>
+</html>

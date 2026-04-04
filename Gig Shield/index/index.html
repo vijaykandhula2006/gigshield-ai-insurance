@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InsureAI — Admin Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --card: #181c26;
+    --border: rgba(255,255,255,0.07);
+    --border-bright: rgba(255,255,255,0.13);
+    --text: #e8eaf0;
+    --muted: #7a7f94;
+    --accent: #4f8ef7;
+    --accent2: #22d3a5;
+    --warn: #f5a623;
+    --danger: #f04a4a;
+    --success: #22c55e;
+    --purple: #9b7ef8;
+    --font: 'Space Grotesk', sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ===== SIDEBAR ===== */
+  aside {
+    width: 220px;
+    min-height: 100vh;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 28px 0;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo-icon {
+    width: 34px; height: 34px;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+  }
+
+  .logo-text { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; }
+  .logo-sub { font-size: 10px; color: var(--muted); font-family: var(--mono); letter-spacing: 1px; text-transform: uppercase; }
+
+  nav { margin-top: 20px; padding: 0 10px; flex: 1; }
+
+  .nav-label {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 12px 6px;
+    font-family: var(--mono);
+  }
+
+  nav a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+
+  nav a:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+  nav a.active { background: rgba(79,142,247,0.12); color: var(--accent); }
+  nav a .ico { width: 18px; text-align: center; font-size: 15px; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: var(--danger);
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 20px;
+    font-family: var(--mono);
+  }
+
+  .sidebar-footer {
+    padding: 16px 20px 0;
+    border-top: 1px solid var(--border);
+    margin-top: auto;
+  }
+
+  .admin-pill {
+    display: flex; align-items: center; gap: 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+  }
+
+  .avatar {
+    width: 28px; height: 28px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+  }
+
+  .admin-name { font-size: 13px; font-weight: 600; }
+  .admin-role { font-size: 11px; color: var(--muted); }
+
+  /* ===== MAIN ===== */
+  main {
+    flex: 1;
+    padding: 28px 32px;
+    overflow-y: auto;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+
+  .page-title { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .page-sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(34,211,165,0.1);
+    border: 1px solid rgba(34,211,165,0.25);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: var(--accent2);
+    font-family: var(--mono);
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    background: var(--accent2);
+    border-radius: 50%;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-bright);
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn:hover { background: rgba(255,255,255,0.09); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #3d7ee8; }
+
+  /* ===== STAT CARDS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border-bright); }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .stat-card.blue::before { background: linear-gradient(90deg, var(--accent), transparent); }
+  .stat-card.green::before { background: linear-gradient(90deg, var(--accent2), transparent); }
+  .stat-card.warn::before { background: linear-gradient(90deg, var(--warn), transparent); }
+  .stat-card.danger::before { background: linear-gradient(90deg, var(--danger), transparent); }
+
+  .stat-icon {
+    width: 36px; height: 36px;
+    border-radius: var(--radius-sm);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    margin-bottom: 14px;
+  }
+  .stat-card.blue .stat-icon { background: rgba(79,142,247,0.12); }
+  .stat-card.green .stat-icon { background: rgba(34,211,165,0.12); }
+  .stat-card.warn .stat-icon { background: rgba(245,166,35,0.12); }
+  .stat-card.danger .stat-icon { background: rgba(240,74,74,0.12); }
+
+  .stat-label { font-size: 12px; color: var(--muted); margin-bottom: 6px; font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.8px; }
+  .stat-value { font-size: 28px; font-weight: 700; letter-spacing: -1px; line-height: 1; margin-bottom: 8px; }
+  .stat-card.blue .stat-value { color: var(--accent); }
+  .stat-card.green .stat-value { color: var(--accent2); }
+  .stat-card.warn .stat-value { color: var(--warn); }
+  .stat-card.danger .stat-value { color: var(--danger); }
+
+  .stat-delta {
+    font-size: 12px;
+    color: var(--success);
+    font-family: var(--mono);
+  }
+  .stat-delta.down { color: var(--danger); }
+
+  /* ===== CHARTS ROW ===== */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .card-title { font-size: 15px; font-weight: 600; }
+  .card-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* ===== TABLES ROW ===== */
+  .tables-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-family: var(--mono);
+    padding: 0 0 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: rgba(255,255,255,0.03); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 11px 0; font-size: 13px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--mono);
+  }
+  .badge.approved { background: rgba(34,197,94,0.12); color: var(--success); }
+  .badge.pending  { background: rgba(245,166,35,0.12); color: var(--warn); }
+  .badge.rejected { background: rgba(240,74,74,0.12);  color: var(--danger); }
+  .badge.fraud    { background: rgba(155,126,248,0.15); color: var(--purple); }
+
+  .amount { font-family: var(--mono); font-size: 13px; font-weight: 500; }
+
+  /* ===== FRAUD PANEL ===== */
+  .fraud-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .fraud-item:last-child { border-bottom: none; }
+
+  .fraud-icon {
+    width: 32px; height: 32px;
+    background: rgba(240,74,74,0.12);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .fraud-id { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 2px; }
+  .fraud-desc { font-size: 13px; margin-bottom: 4px; }
+  .fraud-meta { font-size: 11px; color: var(--muted); }
+
+  .fraud-actions { margin-left: auto; display: flex; gap: 6px; flex-shrink: 0; }
+  .action-btn {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    font-family: var(--font);
+    transition: opacity 0.15s;
+  }
+  .action-btn:hover { opacity: 0.8; }
+  .action-btn.ok { background: rgba(34,197,94,0.15); color: var(--success); border: 1px solid rgba(34,197,94,0.3); }
+  .action-btn.deny { background: rgba(240,74,74,0.12); color: var(--danger); border: 1px solid rgba(240,74,74,0.3); }
+
+  /* ===== BOTTOM ROW ===== */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .trigger-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .trigger-item:last-child { border-bottom: none; }
+
+  .trigger-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .trigger-dot.rain { background: var(--accent); }
+  .trigger-dot.drought { background: var(--warn); }
+  .trigger-dot.flood { background: var(--purple); }
+
+  .trigger-info { flex: 1; }
+  .trigger-name { font-weight: 500; }
+  .trigger-time { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+  .trigger-claims { font-family: var(--mono); font-size: 12px; color: var(--accent2); }
+
+  .progress-bar-bg {
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    height: 5px;
+    overflow: hidden;
+    margin-top: 6px;
+  }
+  .progress-bar { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+  .policy-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .policy-row:last-child { border-bottom: none; }
+  .policy-type { font-weight: 500; }
+  .policy-count { color: var(--muted); font-size: 12px; margin-top: 1px; }
+  .policy-val { font-family: var(--mono); font-weight: 600; }
+  .policy-val.green { color: var(--accent2); }
+  .policy-val.blue { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside>
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-text">InsureAI</div>
+      <div class="logo-sub">Admin Panel</div>
+    </div>
+  </div>
+
+  <nav>
+    <div class="nav-label">Overview</div>
+    <a href="#" class="active"><span class="ico">📊</span> Dashboard</a>
+    <a href="#"><span class="ico">📋</span> Claims</a>
+    <a href="#"><span class="ico">📄</span> Policies</a>
+    <a href="#"><span class="ico">👥</span> Users</a>
+
+    <div class="nav-label" style="margin-top:16px">Monitoring</div>
+    <a href="#"><span class="ico">🚨</span> Fraud Alerts <span class="nav-badge">3</span></a>
+    <a href="#"><span class="ico">🌧️</span> Triggers</a>
+    <a href="#"><span class="ico">💰</span> Transactions</a>
+
+    <div class="nav-label" style="margin-top:16px">System</div>
+    <a href="#"><span class="ico">⚙️</span> Settings</a>
+    <a href="#"><span class="ico">📁</span> Reports</a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="admin-pill">
+      <div class="avatar">A</div>
+      <div>
+        <div class="admin-name">Admin</div>
+        <div class="admin-role">Super Admin</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ===== MAIN ===== -->
+<main>
+  <div class="topbar">
+    <div>
+      <div class="page-title">Control Panel</div>
+      <div class="page-sub">Real-time insurance platform monitoring</div>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+      <button class="btn">Export CSV</button>
+      <button class="btn btn-primary">+ New Policy</button>
+    </div>
+  </div>
+
+  <!-- STAT CARDS -->
+  <div class="stats-grid">
+    <div class="stat-card blue">
+      <div class="stat-icon">👥</div>
+      <div class="stat-label">Total Users</div>
+      <div class="stat-value" id="stat-users">2,847</div>
+      <div class="stat-delta">▲ +143 this week</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-icon">📄</div>
+      <div class="stat-label">Active Policies</div>
+      <div class="stat-value" id="stat-policies">1,293</div>
+      <div class="stat-delta">▲ +87 this month</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-icon">⚡</div>
+      <div class="stat-label">Claims Triggered</div>
+      <div class="stat-value" id="stat-claims">348</div>
+      <div class="stat-delta">▲ +29 today</div>
+    </div>
+    <div class="stat-card danger">
+      <div class="stat-icon">🚨</div>
+      <div class="stat-label">Fraud Alerts</div>
+      <div class="stat-value" id="stat-fraud">3</div>
+      <div class="stat-delta down">▲ +2 unreviewed</div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="charts-row">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Claims over time</div>
+          <div class="card-sub">Auto-triggered vs manually filed</div>
+        </div>
+        <select class="btn" style="padding:5px 10px;font-size:12px;" onchange="updateChart(this.value)">
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+      </div>
+      <div class="chart-wrap"><canvas id="claimsChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Payout distribution</div>
+          <div class="card-sub">By claim category</div>
+        </div>
+      </div>
+      <div class="chart-wrap"><canvas id="payoutChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- TABLES -->
+  <div class="tables-row">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Recent claims</div>
+          <div class="card-sub">Latest 5 triggered claims</div>
+        </div>
+        <button class="btn" style="font-size:12px;padding:5px 10px;">View all</button>
+      </div>
+      <table>
+        <thead>
+            <th>Claim ID</th>
+            <th>User</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Verification</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="claims-table">
+          <!-- JS fills this -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Fraud alerts</div>
+          <div class="card-sub">Requires admin review</div>
+        </div>
+        <span class="badge fraud">3 Open</span>
+      </div>
+      <div id="fraud-list">
+        <!-- JS fills this -->
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM ROW -->
+  <div class="bottom-row">
+    <!-- Rain Trigger Log -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Rain trigger log</div>
+          <div class="card-sub">Event simulation history</div>
+        </div>
+      </div>
+      <div id="trigger-list"></div>
+    </div>
+
+    <!-- Policy Activity -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Policy activity</div>
+          <div class="card-sub">Premium collected by type</div>
+        </div>
+      </div>
+      <div id="policy-list"></div>
+    </div>
+
+    <!-- Admin Quick Actions -->
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Admin actions</div>
+          <div class="card-sub">Quick controls</div>
+        </div>
+      </div>
+        <button class="btn" onclick="simulateRain()" style="width:100%;text-align:left;padding:10px 14px;">🌧️ Simulate Rain Event</button>
+        <button class="btn" onclick="createAdminClaim()" style="width:100%;text-align:left;padding:10px 14px;">➕ File Admin Claim</button>
+        <button class="btn" onclick="generateReport()" style="width:100%;text-align:left;padding:10px 14px;">📊 Generate Claims Report</button>
+        <button class="btn" onclick="runFraudScan()" style="width:100%;text-align:left;padding:10px 14px;">🔍 Run Fraud Scan</button>
+        <button class="btn" onclick="exportData()" style="width:100%;text-align:left;padding:10px 14px;">📤 Export Data (CSV)</button>
+        <button class="btn btn-primary" onclick="approveAll()" style="width:100%;text-align:left;padding:10px 14px;">✅ Approve All Pending</button>
+        <div id="action-feedback" style="font-family:var(--mono);font-size:12px;color:var(--accent2);min-height:18px;margin-top:4px;"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// =============================================================
+//  CONFIG — your Flask backend
+// =============================================================
+const BASE_URL = '';
+
+// Auth token stored after login
+let authToken = null;
+
+// =============================================================
+//  LOGIN MODAL — shown on page load until /login succeeds
+// =============================================================
+function showLoginModal() {
+  // Inject modal HTML if not already present
+  if (document.getElementById('login-modal')) return;
+  const modal = document.createElement('div');
+  modal.id = 'login-modal';
+  modal.style.cssText = `
+    position:fixed;inset:0;background:rgba(0,0,0,0.85);
+    display:flex;align-items:center;justify-content:center;z-index:1000;
+  `;
+  modal.innerHTML = `
+    <div style="
+      background:var(--card);border:1px solid var(--border-bright);
+      border-radius:16px;padding:36px 40px;width:360px;
+    ">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+        <div style="width:34px;height:34px;background:linear-gradient(135deg,var(--accent),var(--purple));
+          border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;">🛡️</div>
+        <div>
+          <div style="font-size:16px;font-weight:700;">Admin Login</div>
+          <div style="font-size:11px;color:var(--muted);font-family:var(--mono);">InsureAI Control Panel</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;color:var(--muted);font-family:var(--mono);
+          text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">
+          Username / Email
+        </label>
+        <input id="login-user" type="text" placeholder="admin@insureai.com" style="
+          width:100%;padding:10px 14px;background:var(--surface);
+          border:1px solid var(--border-bright);border-radius:8px;
+          color:var(--text);font-family:var(--font);font-size:14px;outline:none;
+        "/>
+      </div>
+
+      <div style="margin-bottom:20px;">
+        <label style="font-size:12px;color:var(--muted);font-family:var(--mono);
+          text-transform:uppercase;letter-spacing:.8px;display:block;margin-bottom:6px;">
+          Password
+        </label>
+        <input id="login-pass" type="password" placeholder="••••••••" style="
+          width:100%;padding:10px 14px;background:var(--surface);
+          border:1px solid var(--border-bright);border-radius:8px;
+          color:var(--text);font-family:var(--font);font-size:14px;outline:none;
+        "/>
+      </div>
+
+      <button onclick="doLogin()" style="
+        width:100%;padding:12px;background:var(--accent);border:none;
+        border-radius:8px;color:#fff;font-family:var(--font);font-size:14px;
+        font-weight:600;cursor:pointer;transition:background .15s;
+      ">Sign in</button>
+
+      <div id="login-error" style="
+        font-family:var(--mono);font-size:12px;color:var(--danger);
+        margin-top:12px;min-height:16px;text-align:center;
+      "></div>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:14px;">
+        Connects to <span style="font-family:var(--mono);color:var(--accent2)">POST /login</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Allow Enter key to submit
+  modal.querySelectorAll('input').forEach(inp =>
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); })
+  );
+}
+
+// ---- POST /login ----
+async function doLogin() {
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value.trim();
+  const errEl    = document.getElementById('login-error');
+  errEl.textContent = '';
+
+  if (!username || !password) {
+    errEl.textContent = '> Please fill in both fields';
+    return;
+  }
+
+  const btn = document.querySelector('#login-modal button');
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${BASE_URL}/admin/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Accept token from any common key name your backend sends
+      authToken = data.token || data.access_token || data.jwt || 'session-ok';
+      document.getElementById('login-modal').remove();
+      feedback(`Logged in as ${username}`);
+      // Show username in sidebar
+      const nameEl = document.querySelector('.admin-name');
+      if (nameEl) nameEl.textContent = username;
+    } else {
+      errEl.textContent = '> ' + (data.message || data.error || 'Invalid credentials');
+      btn.textContent = 'Sign in';
+      btn.disabled = false;
+    }
+
+  } catch (err) {
+    // If backend is unreachable — fall through to dashboard with mock data
+    console.warn('Login endpoint unreachable, using mock session:', err);
+    authToken = 'mock-session';
+    document.getElementById('login-modal').remove();
+    feedback('⚠ Backend offline — running with mock data');
+  }
+}
+
+// =============================================================
+//  MOCK DATA (used when backend endpoints don't exist yet)
+// =============================================================
+const claimsData = {
+  7: {
+    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    auto:   [12, 19, 8, 24, 17, 31, 22],
+    manual: [3, 5, 2, 7, 4, 9, 6]
+  },
+  30: {
+    labels: ['W1','W2','W3','W4'],
+    auto:   [87, 104, 93, 129],
+    manual: [18, 24, 19, 31]
+  }
+};
+
+const recentClaims = [
+  { id: '#CLM-2847', user: 'Ravi Kumar',  amount: '₹12,500', status: 'approved', date: 'Today 09:14' },
+  { id: '#CLM-2846', user: 'Meena S.',    amount: '₹8,200',  status: 'pending',  date: 'Today 08:47' },
+  { id: '#CLM-2845', user: 'Arjun Patel', amount: '₹21,000', status: 'approved', date: 'Today 07:32' },
+  { id: '#CLM-2844', user: 'Lakshmi D.',  amount: '₹6,750',  status: 'rejected', date: 'Yesterday'   },
+  { id: '#CLM-2843', user: 'Suresh V.',   amount: '₹15,300', status: 'fraud',    date: 'Yesterday'   },
+];
+
+const fraudAlerts = [
+  { id: '#CLM-2843', desc: 'Duplicate claim same event', user: 'Suresh V.', risk: 'High'   },
+  { id: '#CLM-2801', desc: 'Location mismatch detected', user: 'Priya N.',  risk: 'Medium' },
+  { id: '#CLM-2789', desc: 'Unusual claim frequency',    user: 'Kiran M.',  risk: 'Low'    },
+];
+
+const triggerLog = [
+  { name: 'Heavy Rain — Trichy',     type: 'rain',    time: '09:12 AM',  claims: 14 },
+  { name: 'Drought Alert — Madurai', type: 'drought', time: '07:45 AM',  claims: 7  },
+  { name: 'Flood Warning — Vellore', type: 'flood',   time: 'Yesterday', claims: 23 },
+  { name: 'Rain — Chennai',          type: 'rain',    time: 'Yesterday', claims: 31 },
+];
+
+const policies = [
+  { type: 'Crop Insurance',  count: 612, premium: '₹18.4L', pct: 72 },
+  { type: 'Livestock Cover', count: 341, premium: '₹9.1L',  pct: 45 },
+  { type: 'Property Risk',   count: 218, premium: '₹6.3L',  pct: 30 },
+  { type: 'Parametric Rain', count: 122, premium: '₹3.8L',  pct: 18 },
+];
+
+// =============================================================
+//  AUTH HEADER HELPER
+// =============================================================
+function authHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (authToken && authToken !== 'mock-session') h['Authorization'] = `Bearer ${authToken}`;
+  return h;
+}
+
+// =============================================================
+//  CHARTS
+// =============================================================
+let claimsChart;
+
+function buildClaimsChart(period) {
+  const ctx = document.getElementById('claimsChart').getContext('2d');
+  const d = claimsData[period];
+  if (claimsChart) claimsChart.destroy();
+  claimsChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: d.labels,
+      datasets: [
+        { label: 'Auto-triggered', data: d.auto,   backgroundColor: 'rgba(79,142,247,0.7)', borderRadius: 4 },
+        { label: 'Manual',         data: d.manual, backgroundColor: 'rgba(34,211,165,0.5)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#7a7f94', font: { size: 12 } } } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a7f94', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#7a7f94', font: { size: 11 } } }
+      }
+    }
+  });
+}
+
+function buildPayoutChart() {
+  const ctx = document.getElementById('payoutChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Crop', 'Livestock', 'Property', 'Rain'],
+      datasets: [{
+        data: [44, 26, 18, 12],
+        backgroundColor: ['#4f8ef7','#22d3a5','#f5a623','#9b7ef8'],
+        borderWidth: 0, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '65%',
+      plugins: { legend: { position: 'bottom', labels: { color: '#7a7f94', font: { size: 11 }, padding: 14 } } }
+    }
+  });
+}
+
+function updateChart(val) { buildClaimsChart(parseInt(val)); }
+
+// =============================================================
+//  RENDER HELPERS
+// =============================================================
+function renderClaims(data) {
+  const tbody = document.getElementById('claims-table');
+  tbody.innerHTML = data.map(c => `
+    <tr>
+      <td style="font-family:var(--mono);font-size:12px;color:var(--accent)">${c.id}</td>
+      <td>${c.user}</td>
+      <td class="amount">${c.amount}</td>
+      <td><span class="badge ${c.status}">${c.status}</span></td>
+      <td style="color:var(--muted);font-size:12px">${c.date}</td>
+      <td style="font-size:10px; color:var(--accent2);">${c.verification || 'Manual File'}</td>
+      <td>
+        ${ c.status !== 'approved' && c.status !== 'rejected' ? `
+        <button class="action-btn ok" onclick="resolveClaim('${c.id}', 'approved')" style="padding: 2px 6px; font-size: 10px;">✓</button>
+        <button class="action-btn deny" onclick="resolveClaim('${c.id}', 'rejected')" style="padding: 2px 6px; font-size: 10px;">✕</button>
+        ` : ''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+function renderFraud(data) {
+  const el = document.getElementById('fraud-list');
+  el.innerHTML = data.map(f => `
+    <div class="fraud-item">
+      <div class="fraud-icon">⚠️</div>
+      <div style="flex:1">
+        <div class="fraud-id">${f.id} — <span style="color:var(--danger)">${f.risk} risk</span></div>
+        <div class="fraud-desc">${f.desc}</div>
+        <div class="fraud-meta">User: ${f.user}</div>
+      </div>
+      <div class="fraud-actions">
+        <button class="action-btn ok"   onclick="resolveFraud(this,'ok')">Approve</button>
+        <button class="action-btn deny" onclick="resolveFraud(this,'deny')">Reject</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTriggers(data) {
+  const el = document.getElementById('trigger-list');
+  el.innerHTML = data.map(t => `
+    <div class="trigger-item">
+      <div class="trigger-dot ${t.type || 'rain'}"></div>
+      <div class="trigger-info">
+        <div class="trigger-name">${t.name}</div>
+        <div class="trigger-time">${t.time}</div>
+      </div>
+      <div class="trigger-claims">+${t.claims} claims</div>
+    </div>
+  `).join('');
+}
+
+function renderPolicies(data) {
+  const el = document.getElementById('policy-list');
+  el.innerHTML = data.map(p => `
+    <div class="policy-row">
+      <div>
+        <div class="policy-type">${p.type}</div>
+        <div class="policy-count">${p.count} active</div>
+        <div class="progress-bar-bg" style="width:160px">
+          <div class="progress-bar" style="width:${p.pct}%;background:var(--accent)"></div>
+        </div>
+      </div>
+      <div class="policy-val green">${p.premium}</div>
+    </div>
+  `).join('');
+}
+
+// =============================================================
+//  FEEDBACK BAR
+// =============================================================
+function feedback(msg, isError = false) {
+  const el = document.getElementById('action-feedback');
+  el.style.color = isError ? 'var(--danger)' : 'var(--accent2)';
+  el.textContent = '> ' + msg;
+  setTimeout(() => el.textContent = '', 4000);
+}
+
+// =============================================================
+//  SIMULATE RAIN EVENT  →  POST /trigger-event
+// =============================================================
+async function simulateRain() {
+  const btn = event.currentTarget;
+  const origText = btn.textContent;
+  btn.textContent = '⏳ Triggering…';
+  btn.disabled = true;
+
+    const location = prompt("Enter simulation location (e.g. Delhi NCR, Tamil Nadu):", "Delhi NCR");
+    if(!location) {
+        btn.textContent = origText;
+        btn.disabled = false;
+        return;
+    }
+
+    const payload = {
+        event_type: 'rain',
+        location:   location,
+        intensity:  'heavy',
+        timestamp:  new Date().toISOString()
+    };
+
+    try {
+        const res = await fetch(`${BASE_URL}/trigger-event`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+            // --- Update stat counter ---
+            const claimsGenerated = data.count ?? 0;
+            const statEl = document.getElementById('stat-claims');
+            const current = parseInt(statEl.textContent.replace(/,/g, ''));
+            statEl.textContent = (current + claimsGenerated).toLocaleString();
+
+            // Refresh table and stats from server
+            loadDashboard();
+
+            feedback(`✅ Event triggered — ${claimsGenerated} claims auto-generated in ${location}`);
+        } else {
+      feedback('⚠ Server error: ' + (data.message || data.error || res.status), true);
+    }
+
+  } catch (err) {
+    // Backend unreachable — degrade gracefully
+    console.warn('trigger-event unreachable:', err);
+    const fallbackClaims = 8;
+    const statEl = document.getElementById('stat-claims');
+    const current = parseInt(statEl.textContent.replace(/,/g, ''));
+    statEl.textContent = (current + fallbackClaims).toLocaleString();
+    triggerLog.unshift({ name: 'Rain — simulated', type: 'rain',
+      time: new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }),
+      claims: fallbackClaims });
+    renderTriggers(triggerLog.slice(0, 4));
+    feedback(`⚠ Backend offline — simulated ${fallbackClaims} claims locally`);
+  }
+
+  btn.textContent = origText;
+  btn.disabled = false;
+}
+
+// =============================================================
+//  OTHER ADMIN ACTIONS (mock — wire to real APIs when ready)
+// =============================================================
+function generateReport() { feedback('Claims report exported — report_2024.pdf'); }
+function runFraudScan()    { feedback('Fraud scan complete — 1 new alert flagged'); }
+function exportData()      { feedback('CSV export ready — all_claims.csv'); }
+
+async function createAdminClaim() {
+    const amount = prompt("Enter Claim Amount (₹):", "500");
+    const userId = prompt("Enter User ID:", "U01");
+    if (!amount || !userId) return;
+
+    try {
+        const res = await fetch(`${BASE_URL}/admin/claims`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ amount: parseInt(amount), user_id: userId })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            feedback(`✅ Claim #${data.claim_id} filed for ${userId}`);
+            loadDashboard(); // Refresh
+        } else {
+            feedback(`⚠ Error: ${data.message}`, true);
+        }
+    } catch (err) {
+        feedback("⚠ Backend connection failed", true);
+    }
+}
+
+async function resolveClaim(claimId, action) {
+    try {
+        const res = await fetch(`${BASE_URL}/admin/claims/resolve`, {
+            method: 'POST',
+            headers: authHeaders(),
+            body: JSON.stringify({ claim_id: claimId, action: action })
+        });
+        if (res.ok) {
+            feedback(`✅ Claim ${claimId} ${action}`);
+            loadDashboard(); // Refresh
+        } else {
+            const data = await res.json();
+            feedback(`⚠ Error: ${data.message}`, true);
+        }
+    } catch (err) {
+        feedback("⚠ Backend connection failed", true);
+    }
+}
+
+async function approveAll() {
+  try {
+    const res = await fetch(`${BASE_URL}/admin/approve_all_pending`, {
+      method: 'POST',
+      headers: authHeaders()
+    });
+    if (res.ok) {
+      document.querySelectorAll('.badge.pending').forEach(b => {
+        b.className = 'badge approved'; b.textContent = 'approved';
+      });
+      feedback('All pending claims approved');
+    }
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+async function resolveFraud(btn, action) {
+  const item = btn.closest('.fraud-item');
+  const id = item.querySelector('.fraud-id').textContent.split(' ')[0];
+  
+  try {
+    const res = await fetch(`${BASE_URL}/admin/resolve_fraud`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ claim_id: id, action: action })
+    });
+
+    if (res.ok) {
+      item.style.opacity = '0.4';
+      item.querySelectorAll('.action-btn').forEach(b => b.disabled = true);
+      feedback(`${id} ${action === 'ok' ? 'approved' : 'rejected'}`);
+      const fraudCount = parseInt(document.getElementById('stat-fraud').textContent);
+      if (fraudCount > 0) document.getElementById('stat-fraud').textContent = fraudCount - 1;
+      const openEl = document.querySelector('.badge.fraud');
+      if (openEl) {
+        const n = parseInt(openEl.textContent) - 1;
+        openEl.textContent = n > 0 ? `${n} Open` : 'Resolved';
+      }
+    }
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+// =============================================================
+//  LIVE TICKER
+// =============================================================
+function liveTick() {
+  setInterval(() => {
+    const el = document.getElementById('stat-users');
+    const v = parseInt(el.textContent.replace(/,/g, ''));
+    if (Math.random() > 0.6) el.textContent = (v + 1).toLocaleString();
+  }, 8000);
+}
+
+// =============================================================
+//  INIT
+// =============================================================
+async function loadDashboard() {
+    try {
+        console.log("Fetching dashboard...");
+        const res = await fetch(BASE_URL + "/admin/dashboard", { headers: authHeaders() });
+        const data = await res.json();
+
+        // Update stats
+        document.getElementById("stat-claims").innerText = data.stats.claims;
+        document.getElementById("stat-users").innerText = data.stats.users;
+        document.getElementById("stat-policies").innerText = data.stats.policies;
+        document.getElementById("stat-fraud").innerText = data.stats.fraud;
+
+        renderClaims(data.recent_claims);
+        renderFraud(data.fraud_alerts);
+        renderTriggers(data.trigger_log);
+        renderPolicies(data.policies);
+
+    } catch (err) {
+        console.error("Error loading dashboard:", err);
+    }
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  buildClaimsChart(7);
+  buildPayoutChart();
+  liveTick();
+  loadDashboard();
+});
+
+</script>
+</body>
+</html>
+
